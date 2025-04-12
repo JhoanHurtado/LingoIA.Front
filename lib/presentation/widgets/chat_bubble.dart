@@ -26,27 +26,33 @@ class ChatBubble extends StatelessWidget {
           Row(
             mainAxisAlignment:
                 isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (!isUser)
                 const CircleAvatar(
                   backgroundImage: AssetImage(AppImages.defaultAvatar),
                 ),
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isUser ? theme.hintColor : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  message,
-                  style: TextStyle(
+              Flexible(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isUser ? theme.hintColor : Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    message,
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                    style: TextStyle(
                       color: isUser ? Colors.white : Colors.black87,
                       decoration: correction != null
                           ? TextDecoration.lineThrough
                           : null,
                       decorationColor: Colors.red,
-                      decorationThickness: 2),
+                      decorationThickness: 2,
+                    ),
+                  ),
                 ),
               ),
             ],
