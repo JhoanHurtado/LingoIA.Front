@@ -23,6 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Map<String, dynamic>> messages = [];
   Socket? _socket;
   bool _isConnected = false;
+  String conversationID = "";
 
   @override
   void initState() {
@@ -38,10 +39,16 @@ class _ChatScreenState extends State<ChatScreen> {
       _socket!.listen(
         (data) {
           String response = utf8.decode(data);
+          print(response);
           MessageModel mesg = MessageModel.fromJson(json.decode(response));
           print("📩 Respuesta del servidor: $response");
           setState(() {
-            messages.add({'text': mesg.correctedText, 'isUser': false});
+            messages.add({'text': mesg.assistantResponse, 'isUser': false});
+            conversationID = mesg.conversationId!;
+            if (mesg.explanation != null) {
+              messages[messages.length - 1]['explanation'] =
+                  "${mesg.correctedText}\n${mesg.explanation}";
+            }
           });
         },
         onError: (error) {
@@ -51,7 +58,7 @@ class _ChatScreenState extends State<ChatScreen> {
         },
         onDone: () {
           //print("❌ Desconectado del servidor");
-          //setState(() => _isConnected = false);
+          //setState(() => _isConnected = true);
         },
       );
     } catch (e) {
@@ -76,6 +83,7 @@ class _ChatScreenState extends State<ChatScreen> {
         score: 1,
         createdAt: DateTime.now(),
         token: await secureStorage.read(key: "token"),
+        conversationId: conversationID.isEmpty ? null : conversationID,
       );
       _socket!.write(json.encode(jsonMessage.toJson()));
     } catch (e) {
@@ -86,7 +94,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    _socket?.destroy();
+    _socket?.destroy(); // Cierra bien al salir
+    _messageController.dispose();
     super.dispose();
   }
 
